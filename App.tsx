@@ -1,9 +1,11 @@
 // Import dependencies
-import * as React from 'react';
+import React, { useState} from 'react';
+
 import { Button, StyleSheet, Text, View } from 'react-native';
+import Canvas, {Image as CanvasImage}  from 'react-native-canvas';
 import {
-  Camera,
   Image,
+  ImageUtil,
   media,
   MobileModel,
   Module,
@@ -17,7 +19,8 @@ import { Buffer } from "buffer";
 var similarity = require( 'compute-cosine-similarity' );
 
 
-// var RNFS = require('expo-file-system');
+const T = torchvision.transforms;
+
 import * as fs from 'expo-file-system';
 
 import * as wav from 'node-wav';
@@ -32,14 +35,23 @@ const MEAN_VAR_NORM_MODEL_URL =
 const EMBEDDING_MODEL_URL = 
   'https://github.com/camaosos/speaker-embedding-pytorch-models/raw/main/embedding.ptl';
 
+const LANDMARKS_MODEL_URL = 
+  'https://github.com/camaosos/speaker-embedding-pytorch-models/raw/main/facial_landmarks.ptl';
+
+const FACE_IMAGE_URL = 
+  'https://raw.githubusercontent.com/tiqq111/mediapipe_pytorch/main/facial_landmarks/4.jpg';
+
 
 // Variable to hold a reference to the loaded ML model
 let cfModel: Module | null = null;
 let mvnModel: Module | null = null;
 let eModel: Module | null = null;
 
+let flModel: Module | null = null;
+
 let prediction1: Tensor | null = null;
 let prediction2: Tensor | null = null;
+let landmarks: Tensor | null = null;
 
 
 
@@ -49,9 +61,14 @@ export default function App() {
   // const insets = useSafeAreaInsets();
   // Create a React state to store the top class returned from the
   // classifyImage function
-  const [similarityState, setSimilarityState] = React.useState(
+  const [similarityState, setSimilarityState] = useState(
     "Similarity value here",
   );
+
+  const [landmarksFound, setLandmarksFound] = useState<boolean>(
+    false,
+  );
+
 
   async function loadModels(){
     if (cfModel === null) {
@@ -70,6 +87,12 @@ export default function App() {
       const eFilePath = await MobileModel.download(EMBEDDING_MODEL_URL);
       eModel = await torch.jit._loadForMobile(eFilePath);
       console.log('Embedding model saved');
+    }
+
+    if (flModel === null) {
+      const flFilePath = await MobileModel.download(LANDMARKS_MODEL_URL);
+      flModel = await torch.jit._loadForMobile(flFilePath);
+      console.log('Facial landmarks model saved');
     }
 
     console.log('Load models finished.')
@@ -157,6 +180,72 @@ export default function App() {
     setSimilarityState('Similarity: '+ s.toFixed(5));
   }
 
+  async function makeImagePrediction(){
+    // const randomTensor = torch.randn([1, 3, 192, 192]);
+
+    const image: Image = await ImageUtil.fromURL(FACE_IMAGE_URL);
+    const width = image.getWidth();
+    const height = image.getHeight();
+    const blob = media.toBlob(image);
+    let tensor = torch.fromBlob(blob, [height, width, 3]);
+    tensor = tensor.permute([2, 0, 1]);
+    tensor = tensor.div(127.5).add(-1.0);
+    const centerCrop = T.centerCrop(Math.min(width, height));
+    tensor = centerCrop(tensor);
+    const resize = T.resize(192);
+    tensor = resize(tensor);
+    tensor = tensor.unsqueeze(0);
+    console.log('shape', tensor.shape);
+
+    var flOutput = await flModel.forward<Tensor, Tensor>(tensor);
+    console.log('facial landmarks output', flOutput[0].shape);
+    // console.log('confidence output', flOutput[1].shape);
+
+    landmarks = flOutput[0].reshape([-1, 3]);
+
+    // console.log('landmarks', landmarks.data())
+    console.log('landmarks shape', landmarks.shape)
+
+    setLandmarksFound(true);
+
+  }
+
+  function handleCanvas(canvas: Canvas) {
+
+    if (!(canvas instanceof Canvas)) {
+      return;
+    }
+    const canvasImage = new CanvasImage(canvas);
+    canvas.width = 500;
+    canvas.height = 500;
+    canvasImage.src = FACE_IMAGE_URL;
+    // 
+      if (landmarksFound && landmarks.data().length>0){
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'purple';
+        // ctx.fillRect(0, 0, 100, 100);
+
+        for (let i = 0; i < 468; i++) {
+          // console.log(landmarks.data()[i*3], landmarks.data()[i*3+1])
+          ctx.fillRect(landmarks.data()[i*3]*2, landmarks.data()[i*3+1]*2, 10, 10);
+          // ctx.drawImage(canvasImage, 0, 0, 100, 100);
+
+      }  
+
+  }}
+
+  // useEffect(() => {
+
+  //       }) 
+
+  // function componentDidUpdate() {
+  //   // Get the canvas object from the ref
+  //   const canvas = this.canvas.current;
+  //   const ctx = canvas.getContext("2d");
+  //   ctx.fillStyle = this.state.color;
+  //   ctx.fillRect(0, 0, 100, 100);
+  // }
+
   return (
   // <SafeAreaProvider>
     <View style={StyleSheet.absoluteFill}>
@@ -164,9 +253,13 @@ export default function App() {
       <Button title='Make prediction 1' onPress={makePrediction1} />
       <Button title='Make prediction 2' onPress={makePrediction2} />
       <Button title='Compute similarity' onPress={computeSimilarity} />
+      <Button title='Make Image Prediction' onPress={makeImagePrediction} />
       <View style={styles.labelContainer}>
         {/* Change the text to render the top class label */}
         <Text style={[styles.setFontSizeFour]}>{similarityState}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Canvas style={{ width: '100%', height: '100%', backgroundColor: 'black' }} ref={handleCanvas} />
       </View>
     </View>
   // </SafeAreaProvider>
