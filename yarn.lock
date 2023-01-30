@@ -1801,6 +1801,21 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
+"@types/react-native-canvas@^0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@types/react-native-canvas/-/react-native-canvas-0.1.9.tgz#7808744c7c905d36fca428eadc1f09ba5f378180"
+  integrity sha512-W02xK0lIt9vKk4LNYIOAMQfuW4nbMCeiqCNOdxvCnTyVVhnBjcChdBgELaedUlFk6y71mOOR6sfonOC1TqWeuw==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
+
+"@types/react-native@*":
+  version "0.71.1"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.71.1.tgz#215684a5117e2cc7a97425355e8962ad1a67cf0e"
+  integrity sha512-P9wTeYq7M3azvdHmubbIS85X3jiWvGhl4nqSDUAT47JRUJeM4EmoosSy1rKcDgq7fjUVIIDqVEk3qFdupOd0Nw==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-native@~0.70.6":
   version "0.70.9"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.70.9.tgz#7d9d11960a4ab78c874e77af895f83d2817aac96"

@@ -48,7 +48,7 @@ let mvnModel: Module | null = null;
 let eModel: Module | null = null;
 
 let flModel: Module | null = null;
-
+let imageTensor: Tensor | null = null;
 let prediction1: Tensor | null = null;
 let prediction2: Tensor | null = null;
 let landmarks: Tensor | null = null;
@@ -194,6 +194,7 @@ export default function App() {
     tensor = centerCrop(tensor);
     const resize = T.resize(192);
     tensor = resize(tensor);
+    imageTensor = tensor;
     tensor = tensor.unsqueeze(0);
     console.log('shape', tensor.shape);
 
@@ -223,12 +224,31 @@ export default function App() {
       if (landmarksFound && landmarks.data().length>0){
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = 'purple';
-        // ctx.fillRect(0, 0, 100, 100);
+        // var buffer = new Uint8ClampedArray(192 * 192 * 4);
+        // for(var y = 0; y < 192; y++) {
+        //   for(var x = 0; x < 192; x++) {
+        //       var pos = (y * 192 + x) * 4; // position in buffer based on x and y
+        //       buffer[pos  ] = imageTensor[0][y][x].data()[0];           // some R value [0, 255]
+        //       buffer[pos+1] = imageTensor[1][y][x].data()[0];           // some G value
+        //       buffer[pos+2] = imageTensor[2][y][x].data()[0];           // some B value
+        //       buffer[pos+3] = 255;           // set alpha channel
+        //   }
+        // }
+
+        // // create imageData object
+        // var idata = ctx.createImageData(192, 192);
+
+        // // set our buffer as source
+        // idata.data.set(buffer);
+
+        // // update canvas with new data
+        // ctx.putImageData(idata, 0, 0);
+        ctx.drawImage(canvasImage, 0, 0, 500, 500);
 
         for (let i = 0; i < 468; i++) {
           // console.log(landmarks.data()[i*3], landmarks.data()[i*3+1])
           ctx.fillRect(landmarks.data()[i*3]*2, landmarks.data()[i*3+1]*2, 10, 10);
-          // ctx.drawImage(canvasImage, 0, 0, 100, 100);
+
 
       }  
 
