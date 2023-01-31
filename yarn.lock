@@ -1791,6 +1791,13 @@
   dependencies:
     "@types/istanbul-lib-report" "*"
 
+"@types/node-wav@^0.0.0":
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/@types/node-wav/-/node-wav-0.0.0.tgz#0e3ad82a817f786fb8e4b428fd544f054abc06db"
+  integrity sha512-OUbxnS0TlHs4eG5JK4WalRlCoG4Rvme7eWm8kZhoTTrG5k3lf6ckVunpHZZsHAvVwu5OMZquvd4Hxfd6teR8OQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*":
   version "18.11.18"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz#8dfb97f0da23c2293e554c5a50d61ef134d7697f"
