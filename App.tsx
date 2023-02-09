@@ -1,6 +1,6 @@
 // Import dependencies
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View} from 'react-native';
 
 import AudioComponent from './components/AudioComponent';
 import FaceComponent from './components/FaceComponent';
@@ -13,12 +13,11 @@ export default function App() {
   // Create a React state to store the top class returned from the
   // classifyImage function
 
-
   return (
   // <SafeAreaProvider>
     <View style={StyleSheet.absoluteFill}>
 
-      <AudioComponent/>
+      {/* <AudioComponent/> */}
       <FaceComponent/>
 
     </View>

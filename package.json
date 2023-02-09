@@ -8,11 +8,15 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-community/image-editor": "^2.3.0",
+    "@react-native-voice/voice": "^3.2.4",
     "@techstark/opencv-js": "^4.6.0-release.1",
     "@types/node-wav": "^0.0.0",
     "@types/react-native-canvas": "^0.1.9",
     "compute-cosine-similarity": "^1.0.0",
     "expo": "~47.0.12",
+    "expo-face-detector": "^12.0.0",
+    "expo-speech": "^11.0.0",
     "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
     "node-wav": "^0.0.2",
