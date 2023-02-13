@@ -96,9 +96,9 @@ export default function App() {
   // Safe area insets to compensate for notches and bottom bars
   // const insets = useSafeAreaInsets();
 
-  const [landmarksFound, setLandmarksFound] = useState<boolean>(
-    false,
-  );
+  const [landmarksFound, setLandmarksFound] = useState<boolean>(false);
+
+  const [canvasLandmarks, setCanvasLandmarks] = useState<Tensor>(landmarks1);
 
   const [similarityState, setSimilarityState] = useState(
     "Similarity value here",
@@ -162,13 +162,6 @@ export default function App() {
     let rnTensor =  rnResize(tensor);
     console.log('image tensor 160', rnTensor.data())
 
-
-
-
-    // imageTensor = tensor;
-    // tensor = tensor.unsqueeze(0);
-    // console.log('shape', tensor.shape);
-
     var flOutput = await flModel.forward<Tensor, Tensor>(flTensor.unsqueeze(0));
     console.log('facial landmarks output', flOutput[0].shape);
 
@@ -210,6 +203,8 @@ export default function App() {
     var result1 = await findImageLandmarks(imageUri1, 'file')
     landmarks1 = result1.landmarks;
     embedding1 = result1.embedding;
+    setCanvasLandmarks(result1.landmarks);
+    setLandmarksFound(true);
   }
 
   async function getImageEmbedding2(){
@@ -217,7 +212,7 @@ export default function App() {
     var result2 = await findImageLandmarks(imageUri2, 'file')
     landmarks2 = result2.landmarks;
     embedding2 = result2.embedding;
-
+    setCanvasLandmarks(result2.landmarks);
     setLandmarksFound(true);
   }
 
@@ -237,13 +232,13 @@ export default function App() {
     canvas.height = 192*2;
     canvasImage.src = canvasImageData;
     // 
-    if (landmarksFound && landmarks2.data().length>0){
+    if (landmarksFound && canvasLandmarks.data().length>0){
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = 'purple';
       ctx.drawImage(canvasImage, 0, 0, 192*2, 192*2);
 
       for (let i = 0; i < 468; i++) {
-        ctx.fillRect(landmarks2.data()[i*3]*2, landmarks2.data()[i*3+1]*2, 10, 10);
+        ctx.fillRect(canvasLandmarks.data()[i*3]*2, canvasLandmarks.data()[i*3+1]*2, 10, 10);
 
 
       }   
